@@ -6,7 +6,7 @@
 
 
 
-void parse(char *buffer){
+void parse(char *buffer, int count, Packet *packets){
 
     const char delimeters[] = "$,#";
 
@@ -19,9 +19,11 @@ void parse(char *buffer){
             return;
         }
 
-    Packet *packet = calloc(1, sizeof(Packet));
+    if(count > 0 ){
+        packets = realloc(packets, count * sizeof(Packet));
+    }
 
-    strcpy(packet->telemetry, str);
+    strcpy(packets[count].telemetry, str);
 
     int i = 0;
 
@@ -30,13 +32,13 @@ void parse(char *buffer){
         int value = atoi(str);
 
         if(i == 0){
-            packet->speed = (uint8_t)value;
+            packets[count].speed = (uint8_t)value;
         }
         else if(i == 1){
-            packet->battery = (uint8_t)value;
+            packets[count].battery = (uint8_t)value;
         }
         else{
-            packet->satellites = (uint8_t)value;
+            packets[count].satellites = (uint8_t)value;
         }
 
         i++;

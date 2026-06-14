@@ -10,6 +10,6 @@ typedef struct{
     uint8_t satellites;
 } Packet;
 
-void parse(char *buffer);
+void parse(char *buffer, int count, Packet *packets);
 
 #endif
