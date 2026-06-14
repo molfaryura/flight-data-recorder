@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include "udp.h"
 #include "recorder.h"
 
@@ -44,18 +46,30 @@ int udp_socket(){
 
     socklen_t client_len = sizeof(client_addr);
 
-    int received_bytes = recvfrom(sock, buffer, sizeof(buffer) - 1, 0,
-                                 (struct sockaddr *)&client_addr, &client_len);
+    int count = 0;
 
-    if (received_bytes == -1) {
-        perror("recvfrom\n");
-        close(sock);
-        return 1;
+    Packet *packets = calloc(1, sizeof(Packet));
+
+    while (true) {
+
+        int received_bytes = recvfrom(sock, buffer, sizeof(buffer) - 1, 0,
+                                    (struct sockaddr *)&client_addr, &client_len);
+
+        if (received_bytes == -1) {
+            perror("recvfrom\n");
+            close(sock);
+            return 1;
+        }
+
+        buffer[received_bytes] = '\0';
+
+        parse(buffer, count, packets);
+
+        count++;
     }
 
-    buffer[received_bytes] = '\0';
-
-    parse(buffer);
+    free(packets);
+    packets = NULL;
 
     close(sock);
 
