@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -9,9 +10,23 @@
 #include "recorder.h"
 
 
-int main(){
+int main(int argc, char *argv[]){
 
-    udp_socket();
+    if(argc < 2){
+        printf("Please choose between server or analytics regimes.\n");
+        return 1;
+    }
+
+    if(strcmp(argv[1], "server") == 0){
+        udp_socket();
+    }
+    else if (strcmp(argv[1], "analytic") == 0) {
+        read_from_file();
+    }
+    else {
+        printf("Unknown argument!\n");
+        return 1;
+    }
 
     return 0;
 };
@@ -55,7 +70,8 @@ int udp_socket(){
 
     while (receiving_packets) {
 
-        if(count == 4){
+        if(count == 20){
+            printf("Maximum number of packets received. Writing logs...\n");
             receiving_packets = 0;
         }
 
@@ -80,6 +96,7 @@ int udp_socket(){
         int parsed_buffer = parse(buffer, count, &packets, time_buffer);
 
         if(parsed_buffer == 1){
+            printf("Critical battery. Writing logs...\n");
             receiving_packets = 0;
         }
 
@@ -87,7 +104,6 @@ int udp_socket(){
     }
 
     write_to_file(packets, count);
-    read_from_file(count);
 
     free(packets);
     packets = NULL;
