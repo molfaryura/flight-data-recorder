@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -16,7 +17,7 @@ int parse(char *buffer, int count, Packet **packets, char* time){
     char *str = strtok(packet_str, delimeters);
 
     if (str == NULL) {
-            printf("Помилка: Отримано порожній або некоректний пакет!\n");
+            printf("Error: Received incorrect packet!\n");
             return 1;
         }
 
@@ -58,26 +59,46 @@ int parse(char *buffer, int count, Packet **packets, char* time){
 void write_to_file(Packet *packets, int count){
 
 
-    FILE *file = fopen("blackbox.bin", "wb");
+    FILE *file = fopen("blackbox.bin", "ab");
+
+    if (file == NULL) {
+        perror("fopen");
+        return;
+    }
 
     fwrite(packets, sizeof(Packet), count, file);
-
 
     fclose(file);
 }
 
-void read_from_file(int count){
+void read_from_file(){
 
     FILE *file = fopen("blackbox.bin", "rb");
 
-    Packet packets[count];
+    if (file == NULL) {
+        perror("fopen");
+        return;
+    }
 
-    fread(packets, sizeof(Packet), count, file);
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    rewind(file);
+
+    size_t count = file_size / sizeof(Packet);
+
+    Packet *data = malloc(count * sizeof(Packet));
+
+    fread(data, sizeof(Packet), count, file);
 
     fclose(file);
 
     for (int i = 0; i < count; i++) {
-        printf("%s,%s,%d,%d,%d\n", packets[i].time, packets[i].telemetry, packets[i].speed, packets[i].satellites, packets[i].battery);
+        printf("%s,%s,speed=%d,satelites=%d,battery=%d\n",
+            data[i].time,
+            data[i].telemetry,
+            data[i].speed,
+            data[i].satellites,
+            data[i].battery);
     }
 
 }
