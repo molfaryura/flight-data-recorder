@@ -13,7 +13,7 @@ typedef struct{
 
 int parse(char *buffer, int count, Packet **packets, char* time);
 void write_to_file(Packet *packets, int count);
-void read_from_file(int count);
+void read_from_file();
 
 
 #endif
