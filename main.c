@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <time.h>
 #include "udp.h"
 #include "recorder.h"
 
@@ -50,7 +51,13 @@ int udp_socket(){
 
     Packet *packets = calloc(1, sizeof(Packet));
 
-    while (true) {
+    int receiving_packets = 1;
+
+    while (receiving_packets) {
+
+        if(count == 4){
+            receiving_packets = 0;
+        }
 
         int received_bytes = recvfrom(sock, buffer, sizeof(buffer) - 1, 0,
                                     (struct sockaddr *)&client_addr, &client_len);
@@ -63,10 +70,24 @@ int udp_socket(){
 
         buffer[received_bytes] = '\0';
 
-        parse(buffer, count, packets);
+        time_t raw_time = time(NULL);
+        struct tm *time_info = localtime(&raw_time);
+
+        char time_buffer[50];
+
+        strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", time_info);
+
+        int parsed_buffer = parse(buffer, count, &packets, time_buffer);
+
+        if(parsed_buffer == 1){
+            receiving_packets = 0;
+        }
 
         count++;
     }
+
+    write_to_file(packets, count);
+    read_from_file(count);
 
     free(packets);
     packets = NULL;
