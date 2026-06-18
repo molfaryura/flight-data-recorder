@@ -89,7 +89,7 @@ int udp_socket(){
         time_t raw_time = time(NULL);
         struct tm *time_info = localtime(&raw_time);
 
-        char time_buffer[50];
+        char time_buffer[20];
 
         strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", time_info);
 

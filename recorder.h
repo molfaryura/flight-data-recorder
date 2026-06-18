@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 typedef struct{
-    char time[50];
-    char telemetry[50];
+    char time[20];
+    char telemetry[20];
     uint8_t speed;
     uint8_t battery;
     uint8_t satellites;
