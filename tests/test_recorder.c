@@ -43,12 +43,21 @@ void test_check_empty_string(void){
     TEST_ASSERT_TRUE(result);
 }
 
+void test_check_low_battery(void){
+    char str[] = "$DATA,40,10,14#";
+
+    int result = parse(str, 0, &packets, time_buffer);
+
+    TEST_ASSERT_TRUE(result);
+}
+
 int main(void){
     UNITY_BEGIN();
 
     RUN_TEST(test_size_of_packet);
     RUN_TEST(test_correct_string_parsing);
     RUN_TEST(test_check_empty_string);
+    RUN_TEST(test_check_low_battery);
 
     return UNITY_END();
 }
