@@ -2,14 +2,17 @@
 #include "support/unity.h"
 #include "../recorder.h"
 
+static Packet *packets;
+static char time_buffer[20] = "2026-06-18 16:02:25";
 
 void setUp(void) {
-
+    packets = calloc(1, sizeof(Packet));
 }
 
 
 void tearDown(void) {
-
+    free(packets);
+    packets = NULL;
 }
 
 void test_size_of_packet(void){
@@ -20,9 +23,6 @@ void test_size_of_packet(void){
 }
 
 void test_correct_string_parsing(void){
-    Packet *packets = calloc(1, sizeof(Packet));
-
-    char time_buffer[20] = "2026-06-18 16:02:25";
 
     char buffer[] = "$DATA,30,12,90#";
 
@@ -35,12 +35,20 @@ void test_correct_string_parsing(void){
 
 }
 
+void test_check_empty_string(void){
+    char empty_string[] = "";
+
+    int result = parse(empty_string, 0, &packets, time_buffer);
+
+    TEST_ASSERT_TRUE(result);
+}
 
 int main(void){
     UNITY_BEGIN();
 
     RUN_TEST(test_size_of_packet);
     RUN_TEST(test_correct_string_parsing);
+    RUN_TEST(test_check_empty_string);
 
     return UNITY_END();
 }
