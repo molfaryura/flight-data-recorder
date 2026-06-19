@@ -62,9 +62,9 @@ void test_write_to_file(void){
     packets[0].satellites = 12;
     packets[0].battery = 50;
 
-    write_to_file(packets, 1);
+    write_to_file("test.bin", packets, 1);
 
-    FILE *file = fopen("blackbox.bin", "rb");
+    FILE *file = fopen("test.bin", "rb");
 
     Packet data;
 

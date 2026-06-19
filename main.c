@@ -21,7 +21,7 @@ int main(int argc, char *argv[]){
         udp_socket();
     }
     else if (strcmp(argv[1], "analytic") == 0) {
-        read_from_file();
+        read_from_file("blackbox.bin");
     }
     else {
         printf("Unknown argument!\n");
@@ -103,7 +103,7 @@ int udp_socket(){
         count++;
     }
 
-    write_to_file(packets, count);
+    write_to_file("blackbox.bin", packets, count);
 
     free(packets);
     packets = NULL;

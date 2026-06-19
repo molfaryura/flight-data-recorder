@@ -56,10 +56,10 @@ int parse(char *buffer, int count, Packet **packets, char* time){
 }
 
 
-void write_to_file(Packet *packets, int count){
+void write_to_file(char file_name[], Packet *packets, int count){
 
 
-    FILE *file = fopen("blackbox.bin", "ab");
+    FILE *file = fopen(file_name, "ab");
 
     if (file == NULL) {
         perror("fopen");
@@ -71,9 +71,9 @@ void write_to_file(Packet *packets, int count){
     fclose(file);
 }
 
-void read_from_file(){
+void read_from_file(char file_name[]){
 
-    FILE *file = fopen("blackbox.bin", "rb");
+    FILE *file = fopen(file_name, "rb");
 
     if (file == NULL) {
         perror("fopen");
