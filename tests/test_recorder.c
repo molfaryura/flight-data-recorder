@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "support/unity.h"
 #include "../recorder.h"
 
@@ -51,6 +52,33 @@ void test_check_low_battery(void){
     TEST_ASSERT_TRUE(result);
 }
 
+void test_write_to_file(void){
+    strcpy(packets[0].time, time_buffer);
+
+    char str[] = "DATA";
+    strcpy(packets[0].telemetry, str);
+
+    packets[0].speed = 40;
+    packets[0].satellites = 12;
+    packets[0].battery = 50;
+
+    write_to_file(packets, 1);
+
+    FILE *file = fopen("blackbox.bin", "rb");
+
+    Packet data;
+
+    size_t read = fread(&data, sizeof(Packet), 1, file);
+
+    TEST_ASSERT_EQUAL_INT(1, read);
+    TEST_ASSERT_EQUAL_STRING(data.time, time_buffer);
+    TEST_ASSERT_EQUAL_STRING(data.telemetry, "DATA");
+    TEST_ASSERT_EQUAL_INT(data.speed, 40);
+    TEST_ASSERT_EQUAL_INT(data.satellites, 12);
+    TEST_ASSERT_EQUAL_INT(data.battery, 50);
+
+}
+
 int main(void){
     UNITY_BEGIN();
 
@@ -58,6 +86,7 @@ int main(void){
     RUN_TEST(test_correct_string_parsing);
     RUN_TEST(test_check_empty_string);
     RUN_TEST(test_check_low_battery);
+    RUN_TEST(test_write_to_file);
 
     return UNITY_END();
 }
