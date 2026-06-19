@@ -70,6 +70,8 @@ void test_write_to_file(void){
 
     size_t read = fread(&data, sizeof(Packet), 1, file);
 
+    fclose(file);
+
     TEST_ASSERT_EQUAL_INT(1, read);
     TEST_ASSERT_EQUAL_STRING(data.time, time_buffer);
     TEST_ASSERT_EQUAL_STRING(data.telemetry, "DATA");
