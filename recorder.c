@@ -71,13 +71,13 @@ void write_to_file(char file_name[], Packet *packets, int count){
     fclose(file);
 }
 
-void read_from_file(char file_name[]){
+void* read_from_file(char file_name[]){
 
     FILE *file = fopen(file_name, "rb");
 
     if (file == NULL) {
         perror("fopen");
-        return;
+        return file;
     }
 
     fseek(file, 0, SEEK_END);
@@ -100,5 +100,6 @@ void read_from_file(char file_name[]){
             data[i].satellites,
             data[i].battery);
     }
+    return data;
 
 }
