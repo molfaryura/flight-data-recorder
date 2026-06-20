@@ -62,9 +62,9 @@ void test_write_to_file(void){
     packets[0].satellites = 12;
     packets[0].battery = 50;
 
-    write_to_file("test.bin", packets, 1);
+    write_to_file("test_write.bin", packets, 1);
 
-    FILE *file = fopen("test.bin", "rb");
+    FILE *file = fopen("test_write.bin", "rb");
 
     Packet data;
 
@@ -74,10 +74,34 @@ void test_write_to_file(void){
 
     TEST_ASSERT_EQUAL_INT(1, read);
     TEST_ASSERT_EQUAL_STRING(data.time, time_buffer);
-    TEST_ASSERT_EQUAL_STRING(data.telemetry, "DATA");
+    TEST_ASSERT_EQUAL_STRING(data.telemetry, str);
     TEST_ASSERT_EQUAL_INT(data.speed, 40);
     TEST_ASSERT_EQUAL_INT(data.satellites, 12);
     TEST_ASSERT_EQUAL_INT(data.battery, 50);
+
+}
+
+void test_read_from_file(void){
+    strcpy(packets[0].time, time_buffer);
+    char str[] = "WARNING";
+    strcpy(packets[0].telemetry, str);
+
+    packets[0].speed = 20;
+    packets[0].satellites = 5;
+    packets[0].battery = 85;
+
+    FILE *file = fopen("test_read.bin", "wb");
+    fwrite(packets, sizeof(Packet), 1, file);
+    fclose(file);
+
+    Packet *data = read_from_file("test_read.bin");
+
+    TEST_ASSERT_EQUAL_STRING(data[0].time, time_buffer);
+    TEST_ASSERT_EQUAL_STRING(data[0].telemetry, str);
+    TEST_ASSERT_EQUAL_INT(data[0].speed, 20);
+    TEST_ASSERT_EQUAL_INT(data[0].satellites, 5);
+    TEST_ASSERT_EQUAL_INT(data[0].battery, 85);
+
 
 }
 
@@ -89,6 +113,7 @@ int main(void){
     RUN_TEST(test_check_empty_string);
     RUN_TEST(test_check_low_battery);
     RUN_TEST(test_write_to_file);
+    RUN_TEST(test_read_from_file);
 
     return UNITY_END();
 }
