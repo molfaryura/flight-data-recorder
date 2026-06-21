@@ -69,10 +69,8 @@ int udp_socket(){
     int receiving_packets = 1;
 
     while (receiving_packets) {
-
-        if(count == 20){
-            printf("Maximum number of packets received. Writing logs...\n");
-            receiving_packets = 0;
+        if(count == 5){
+            break;
         }
 
         int received_bytes = recvfrom(sock, buffer, sizeof(buffer) - 1, 0,
