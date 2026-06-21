@@ -21,7 +21,8 @@ int main(int argc, char *argv[]){
         udp_socket();
     }
     else if (strcmp(argv[1], "analytic") == 0) {
-        read_from_file("blackbox.bin");
+        void *data = read_from_file("blackbox.bin");
+        free(data);
     }
     else {
         printf("Unknown argument!\n");
@@ -79,6 +80,7 @@ int udp_socket(){
         if (received_bytes == -1) {
             perror("recvfrom\n");
             close(sock);
+            free(packets);
             return 1;
         }
 
@@ -96,6 +98,14 @@ int udp_socket(){
         if(parsed_buffer == 1){
             printf("Critical battery. Writing logs...\n");
             receiving_packets = 0;
+        }
+        else if (parsed_buffer == 2) {
+            printf("Corrupted packet...\n");
+            count++;
+            continue;
+        }
+        else if (parsed_buffer == 3) {
+            break;
         }
 
         count++;

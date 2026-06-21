@@ -18,11 +18,19 @@ int parse(char *buffer, int count, Packet **packets, char* time){
 
     if (str == NULL) {
             printf("Error: Received incorrect packet!\n");
-            return 1;
+            return 2;
         }
 
 
-    *packets = realloc(*packets, (count + 1) * sizeof(Packet));
+    Packet *temp = realloc(*packets, (count + 1) * sizeof(Packet));
+
+    if(temp != NULL){
+        *packets = temp;
+    }
+    else {
+        printf("Error: Can not reallocate memory!\n");
+        return 3;
+    }
 
 
     strcpy((*packets)[count].time, time);
@@ -41,11 +49,14 @@ int parse(char *buffer, int count, Packet **packets, char* time){
             (*packets)[count].satellites = (uint8_t)value;
 
         }
-        else{
+        else if(i == 2){
             (*packets)[count].battery = (uint8_t)value;
             if(value <= 15){
                 return 1;
             }
+        }
+        else {
+            return 2;
         }
 
         i++;
