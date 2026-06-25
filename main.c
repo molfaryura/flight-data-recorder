@@ -87,13 +87,8 @@ int udp_socket(){
         buffer[received_bytes] = '\0';
 
         time_t raw_time = time(NULL);
-        struct tm *time_info = localtime(&raw_time);
 
-        char time_buffer[20];
-
-        strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", time_info);
-
-        int parsed_buffer = parse(buffer, count, &packets, time_buffer);
+        int parsed_buffer = parse(buffer, count, &packets, (uint32_t)raw_time);
 
         if(parsed_buffer == 1){
             printf("Critical battery. Writing logs...\n");
@@ -101,7 +96,6 @@ int udp_socket(){
         }
         else if (parsed_buffer == 2) {
             printf("Corrupted packet...\n");
-            count++;
             continue;
         }
         else if (parsed_buffer == 3) {
