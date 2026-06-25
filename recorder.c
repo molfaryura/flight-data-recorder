@@ -8,7 +8,7 @@
 
 
 
-int parse(char *buffer, int count, Packet **packets, char* time){
+int parse(char *buffer, int count, Packet **packets, uint32_t time){
 
     const char delimeters[] = "$,#";
 
@@ -32,9 +32,29 @@ int parse(char *buffer, int count, Packet **packets, char* time){
         return 3;
     }
 
+    (*packets)[count].time =  time;
 
-    strcpy((*packets)[count].time, time);
-    strcpy((*packets)[count].telemetry, str);
+    if (strlen(str) > 19) {
+        printf("Invalid length on telemetry!\n");
+        return 2;
+    }
+
+    int num_telemetry = 0;
+    if(strcmp(str, "DATA") == 0){
+        num_telemetry = 1;
+    }
+    else if (strcmp(str, "WARN") == 0) {
+        num_telemetry = 2;
+    }
+    else if (strcmp(str, "ERR") == 0) {
+        num_telemetry = 3;
+    }
+    else {
+        printf("Invalid telemetry tag!\n");
+        return 3;
+    }
+
+    (*packets)[count].telemetry = num_telemetry;
 
     int i = 0;
 
@@ -104,9 +124,28 @@ void* read_from_file(char file_name[]){
     fclose(file);
 
     for (int i = 0; i < count; i++) {
+        char time_buffer[20];
+        time_t time = data[i].time;
+        struct tm *time_info = localtime(&time);
+        strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", time_info);
+
+        char telemetry[20];
+        switch (data[i].telemetry) {
+            case 1:
+                strcpy(telemetry, "Data");
+                break;
+            case 2:
+                strcpy(telemetry, "Warn");
+                break;
+            case 3:
+                strcpy(telemetry, "Err");
+                break;
+
+        }
+
         printf("%s,%s,speed=%d,satelites=%d,battery=%d\n",
-            data[i].time,
-            data[i].telemetry,
+            time_buffer,
+            telemetry,
             data[i].speed,
             data[i].satellites,
             data[i].battery);
